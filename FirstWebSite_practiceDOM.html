@@ -1,0 +1,240 @@
+<!-- <html>
+    <head>
+        <link rel="stylesheet" 
+            href="https://pyscript.net/alpha/pyscript.css" />
+        <script defer 
+            src="https://pyscript.net/alpha/pyscript.js">
+        </script>
+        <link rel="stylesheet" 
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <py-env>
+        - pandas
+    </py-env>
+    </head>
+    <body>
+        HTML layout code goes here -->
+        <!-- <py-script>
+            import pandas as pd
+            
+            data=[['car', 'Minivan', 3, 'red'],['car', 'RaceCar', 4, 'Blue'],['truck', 'pickup', 5, 'red'],
+            ['truck', 'Semi', 6, 'blue'],['MoterCycle', 'dirtbike', 1, 'blue'],['MoterCycle', 'BulletBike', 2, 'red']]
+            cols=['vehicle', 'model', 'motor size', 'color']
+            a=pd.DataFrame(data, columns=cols)
+            a.set_index('model', inplace=True)
+            print('hello world')
+            pyscript.write('data',a)
+
+
+        </py-script>
+    </body>
+    <button py-click="current_time()" id="get-time" class="py-button">Get Current TIME</button>
+    <p id="current_time"></p>
+    <p id="data"></p>
+</html> -->
+
+
+
+<html>
+    <head>
+        <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+        <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+            
+        </script>
+        <link rel="stylesheet" 
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
+    <py-config>
+        packages=["utils", "pandas"]
+    </py-config>
+
+    </head>
+    <body>
+        <py-script>
+            import pandas as pd
+            from pyscript import Element 
+
+            data=[['Car', 'Minivan', 3, 'Red'],['Car', 'RaceCar', 4, 'Blue'],['Truck', 'Pickup', 5, 'Red'],
+            ['Truck', 'Semi', 6, 'Blue'],['MoterCycle', 'Dirtbike', 1, 'Blue'],['MoterCycle', 'BulletBike', 2, 'Red']]
+            
+            cols=['vehicle', 'model', 'motor size', 'color']
+            
+            a=pd.DataFrame(data, columns=cols)
+            
+            a.set_index('model', inplace=True)
+            
+            
+
+
+            tasks=[]
+            task_template= Element("task-template").select(".task", from_content=True)
+            task_list = Element("list-tasks-container")
+            new_task_content = Element("new-task-content")
+            def add_task(*ags, **kws):
+                # ignore empty task
+                if not new_task_content.element.value:
+                    return None
+                # create task
+                task_id = f"task-{len(tasks)}"
+                task = {
+                    "id": task_id,
+                    "content": new_task_content.element.value,
+                    "done": False,
+                }
+                tasks.append(task)
+
+                task_html = task_template.clone(task_id)
+                task_html_content = task_html.select("p")
+                task_html_content.element.innerText = task["content"]
+                task_html_check = task_html.select("input")
+                task_list.element.appendChild(task_html.element)
+
+                #print('task_html_content.element.innerText: {}'.format(task_html_content.element.innerText)) #this is what is put into the task bar input
+                previousContent=task_html_content.element.innerText
+                new_task_content.clear()
+            
+                print(previousContent)
+                a.sort_values(by=[str(previousContent)], inplace=True)
+                pyscript.write('data',a)
+
+            def add_task_event(e):
+                if e.key == "Enter":
+                    add_task()
+            
+            print(tasks)
+            
+            
+            
+            new_task_content.element.onkeypress = add_task_event
+
+        </py-script>
+        <section>
+            <div class="text-center w-full mb-8">
+                <h1 class="text=3xl font-bold text-gray-800 uppercase tracking-tight"> To Do List</h1> 
+            </div>
+            <div>
+                <input id="new-task-content" class="py-input" type="text">
+                <button id="new-task-btn" class="py-button" type="submit" py-click="add_task()">
+                    filter
+                </button>
+            </div>
+            <div id="list-tasks-container" class="flex flex-col-reverse mt-4"></div>
+            <template id="task-template">
+                <section class="task py-li-element">
+                    <label for="flex items-center p-2">
+                        <input class="mr-2" type="checkbox">
+                        <p class="m-0 inline"></p>
+                    </label>
+                </section>
+            </template>
+        </section>
+    </body>
+    <p id="data"></p>
+</html>
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Writing to the page</title>
+
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  </head>
+
+  <body>
+
+    <py-config>
+        packages = ["requests", "pyodide-http"]
+    </py-config>
+
+    <div id="manual-write"></div>
+    <button py-click="write_to_page()" id="manual">Say Hi</button>
+
+    <div id="displayer"></div>
+    <button py-click="display_to_div()" id="display">Say Hello</button>
+
+    <button py-click="print_to_page()" id="print">Say print</button>
+
+    <button py-click="current_time()" id="get-time" class="py-button"> What time is it</button>
+    <h1 id="current_time"></h1>
+
+    <py-script>
+        import datetime
+        
+        def write_to_page():
+            manual_div = Element("manual-write")
+            manual_div.element.innerText = 'hello World'
+
+        def display_to_div():
+            display('display things', target='displayer')
+        
+        def print_to_page():
+            print('printing')
+        
+        def current_time():
+            now = datetime.datetime.now()
+            paragraph = Element('current_time')
+            paragraph.write(now.strftime("%Y-%m-%d %H:%M:%S"))
+
+    </py-script>
+
+  </body>
+</html> -->
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>My Todo</title>
+
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  </head>
+
+  <body>
+    <py-config>
+        [[fetch]]
+        from = "https://pyscript.net/examples/"
+        files =["utils.py"]
+        [[fetch]]
+        from = "https://gist.githubusercontent.com/FabioRosado/faba0b7f6ad4438b07c9ac567c73b864/raw/37603b76dc7ef7997bf36781ea0116150f727f44/"
+        files = ["todo.py"]
+    </py-config>
+    <py-script>
+        from todo import add_task, add_task_event
+    </py-script>
+    <section>
+        <div class="text-center w-full mb-8">
+            <h1 class="text=3xl font-bold text-gray-800 uppercase tracking-tight"> To Do List</h1> 
+        </div>
+        <div>
+            <input id="new-task-content" class="py-input" type="text">
+            <button id="new-task-btn" class="py-button" type="submit" py-click="add_task()">
+                Add Task
+            </button>
+        </div>
+        <div id="list-tasks-container" class="flex flex-col-reverse mt-4"></div>
+        <template id="task-template">
+            <section class="task py-li-element">
+                <label for="flex items-center p-2">
+                    <input class="mr-2" type="checkbox">
+                    <p class="m-0 inline"></p>
+                </label>
+            </section>
+        </template>
+    </section>
+  </body>
+</html> -->
+
