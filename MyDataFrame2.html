@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+        <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+            
+        </script>
+        <link rel="stylesheet" 
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
+        <py-config>
+            packages = [
+              "https://cdn.holoviz.org/panel/0.14.3/dist/wheels/bokeh-2.4.3-py3-none-any.whl",
+              "altair",
+              "numpy",
+              "pandas",
+              "scikit-learn",
+              "panel==0.13.1"
+            ]
+            plugins = [
+              "https://pyscript.net/latest/plugins/python/py_tutor.py"
+            ]
+        </py-config>
+
+    </head>
+    <body>
+        <py-script>
+            import altair as alt
+            import panel as pn
+            import pandas as pd
+
+            data=[['Car', 'Minivan', 3, 'Red'],['Car', 'RaceCar', 4, 'Blue'],['Truck', 'Pickup', 5, 'Red'],
+            ['Truck', 'Semi', 6, 'Blue'],['MoterCycle', 'Dirtbike', 1, 'Blue'],['MoterCycle', 'BulletBike', 2, 'Red']]
+            cols=['vehicle', 'model', 'motor size', 'color']
+            
+            df = pd.DataFrame(data, columns=cols)
+
+
+            sortvec=[]
+
+
+            def sort_reset():
+                sortvec=[]
+                df = pd.DataFrame(data, columns=cols)
+                add_sort_item(sortvec)
+                df_to_html(df)
+                
+                
+            def add_sort_item(item):
+                if len(item)>0:
+                    sortvec.append(item)    
+                else:
+                    sortvec.clear()
+                sort_df(sortvec)
+
+            def sort_df(sortvec):
+                df.sort_values(sortvec, inplace=True)
+                df_to_html(df)
+                if len(sortvec)>0:
+                    print('Sorted by: {}'.format(sortvec))
+                else:
+                    sortvec=[]
+                return df
+
+            def df_to_html(df):
+                df_html=Element("df_tab")
+                df_html.element.innerHTML=df.to_html(table_id='df_table')
+            
+            sort_df(sortvec)
+            
+        </py-script>
+    </body>
+    <div id="df_tab"></div>
+    <!-- <div> Sort by Single Feature</div>
+    <div>             
+        <button py-click="sort_df(['model'])" id="sort1" class="py-button">Modle</button>
+        <button py-click="sort_df(['vehicle'])" id="sort1" class="py-button">Vehicle</button>
+        <button py-click="sort_df(['motor size'])" id="sort1" class="py-button">Motor Size</button>
+        <button py-click="sort_df(['color'])" id="sort1" class="py-button">Color</button>
+    </div> -->
+    <div> Sort by Multiple Features in Order</div>
+    <div>             
+        <button py-click="add_sort_item('model')" id="sort1" class="py-button">Modle</button>
+        <button py-click="add_sort_item('vehicle')" id="sort1" class="py-button">Vehicle</button>
+        <button py-click="add_sort_item('motor size')" id="sort1" class="py-button">Motor Size</button>
+        <button py-click="add_sort_item('color')" id="sort1" class="py-button">Color</button>
+    </div>
+
+    <div> Clear Filter</div>
+    <div>             
+        <button py-click="sort_reset()" id="sort1" class="py-button">Reset</button>
+    </div>
+
+    </html>
